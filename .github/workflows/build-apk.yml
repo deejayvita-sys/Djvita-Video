@@ -1,0 +1,36 @@
+
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: read
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx3g
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stáhnout zdrojový projekt
+        uses: actions/checkout@v4
+      - name: Nastavit Javu 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Připravit Gradle 8.9
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.9'
+      - name: Sestavit instalační APK
+        run: gradle --no-daemon assembleDebug
+      - name: Uložit APK ke stažení
+        uses: actions/upload-artifact@v4
+        with:
+          name: DJVitaVideo-debug-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
